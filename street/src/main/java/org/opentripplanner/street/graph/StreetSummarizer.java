@@ -8,7 +8,9 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
+import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
+import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 class StreetSummarizer {
@@ -32,6 +34,16 @@ class StreetSummarizer {
         summarizeVertex(e.getFromVertex()),
         summarizeVertex(e.getToVertex())
       );
+      case StreetTransitEntityLink link -> String.format(
+        "%s linked to %s",
+        summarizeVertex(link.getFromVertex()),
+        summarizeVertex(link.getToVertex())
+      );
+      case VehicleParkingEdge p -> String.format(
+        "Parking %s → %s",
+        summarizeVertex(p.getFromVertex()),
+        summarizeVertex(p.getToVertex())
+      );
       default -> throw new NotImplementedException(
         "No summary for edge " + e.getClass().getSimpleName()
       );
@@ -45,6 +57,12 @@ class StreetSummarizer {
       "(%s,%s)".formatted(DECIMAL_FORMAT.format(v.getLat()), DECIMAL_FORMAT.format(v.getLon()))
     );
     buf.append(coord);
+    if (v instanceof TransitStopVertex tsv) {
+      buf.append("[%s]".formatted(tsv.getId()));
+    }
+    if (v instanceof VehicleParkingEntranceVertex pev) {
+      buf.append("[%s]".formatted(pev.getLabel()));
+    }
 
     if (!v.areaStops().isEmpty()) {
       var ids = v
