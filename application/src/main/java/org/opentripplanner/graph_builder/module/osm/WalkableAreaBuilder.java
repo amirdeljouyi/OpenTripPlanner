@@ -50,8 +50,6 @@ import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class WalkableAreaBuilder {
 
@@ -73,8 +71,6 @@ class WalkableAreaBuilder {
 
   // template for AreaEdge names
   private static final String LABEL_TEMPLATE = "way (area) %s from %s to %s";
-
-  private static final Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
   public WalkableAreaBuilder(
     Graph graph,
