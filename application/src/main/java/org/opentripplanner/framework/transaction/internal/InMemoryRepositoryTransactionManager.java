@@ -2,15 +2,16 @@ package org.opentripplanner.framework.transaction.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.transaction.Transaction;
 
 class InMemoryRepositoryTransactionManager {
 
-  private final AtomicReference<DefaultTransaction> currentTransaction = new AtomicReference<>(
-    DefaultTransaction.next()
-  );
+  private final AtomicLong idSequence = new AtomicLong(0);
+
+  private final AtomicReference<Transaction> currentTransaction = new AtomicReference<>(next());
 
   private final List<InMemoryTransactionalRepository<?, ?>> repositories = new ArrayList<>();
 
@@ -20,7 +21,7 @@ class InMemoryRepositoryTransactionManager {
 
   public void commit() {
     var currentTx = currentTransaction.get();
-    var nextTx = DefaultTransaction.next();
+    var nextTx = next();
 
     for (var repository : repositories) {
       repository.commit(currentTx, nextTx);
@@ -32,7 +33,11 @@ class InMemoryRepositoryTransactionManager {
     repositories.add(repository);
   }
 
-  Supplier<DefaultTransaction> currentTransaction() {
+  Supplier<Transaction> currentTransaction() {
     return currentTransaction::get;
+  }
+
+  private Transaction next() {
+    return new DefaultTransaction(idSequence.incrementAndGet());
   }
 }

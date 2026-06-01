@@ -1,20 +1,14 @@
 package org.opentripplanner.framework.transaction.internal;
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
 import org.opentripplanner.framework.transaction.Transaction;
 
 final class DefaultTransaction implements Transaction {
 
-  private static final AtomicLong ID_SEQUENCE = new AtomicLong(0);
   private final long id;
 
-  DefaultTransaction() {
-    this.id = ID_SEQUENCE.incrementAndGet();
-  }
-
-  public static DefaultTransaction next() {
-    return new DefaultTransaction();
+  public DefaultTransaction(long id) {
+    this.id = id;
   }
 
   @Override
@@ -29,5 +23,10 @@ final class DefaultTransaction implements Transaction {
   @Override
   public int hashCode() {
     return Objects.hashCode(id);
+  }
+
+  @Override
+  public String toString() {
+    return "TXN-" + id;
   }
 }

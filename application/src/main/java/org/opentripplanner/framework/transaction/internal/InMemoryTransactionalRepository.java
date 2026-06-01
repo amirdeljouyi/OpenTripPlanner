@@ -11,7 +11,7 @@ import org.opentripplanner.framework.transaction.TransactionalRepository;
 class InMemoryTransactionalRepository<S, T> implements TransactionalRepository<S, T> {
 
   private final RepositoryLifecycle<S, T> lifecycle;
-  private final Supplier<DefaultTransaction> transactionProvider;
+  private final Supplier<Transaction> transactionProvider;
   private final Map<Transaction, S> snapshotCash = new WeakHashMap<>();
   private T mutableSnapshot;
 
@@ -37,7 +37,7 @@ class InMemoryTransactionalRepository<S, T> implements TransactionalRepository<S
     return this::currentMutableSnapshot;
   }
 
-  void commit(DefaultTransaction currentTransaction, DefaultTransaction nextTransaction) {
+  void commit(Transaction currentTransaction, Transaction nextTransaction) {
     if (mutableSnapshot != null) {
       setSnapshot(lifecycle.freeze(mutableSnapshot), nextTransaction);
     } else {
@@ -56,7 +56,7 @@ class InMemoryTransactionalRepository<S, T> implements TransactionalRepository<S
     return mutableSnapshot;
   }
 
-  private void setSnapshot(S snapshot, DefaultTransaction transaction) {
+  private void setSnapshot(S snapshot, Transaction transaction) {
     Objects.requireNonNull(snapshot);
     synchronized (snapshotCash) {
       snapshotCash.put(transaction, snapshot);
