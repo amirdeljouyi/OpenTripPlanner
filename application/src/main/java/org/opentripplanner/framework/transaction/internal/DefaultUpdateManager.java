@@ -19,17 +19,17 @@ import org.opentripplanner.framework.transaction.WriteContext;
  *
  * <p>Owns a single-threaded {@link ExecutorService} that serialises all submitted tasks.
  * After each task completes, changes are committed via the
- * {@link InMemoryRepositoryTransactionManager}. The transaction manager is package-private and
+ * {@link TransactionManager}. The transaction manager is package-private and
  * never exposed to callers — commit is an internal implementation detail.
  */
 class DefaultUpdateManager implements UpdateManager {
 
-  private final InMemoryRepositoryTransactionManager transactionManager;
+  private final TransactionManager transactionManager;
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
   private final Map<Class<?>, List<DefaultWriteContext.HandlerEntry<?, ?>>> eventHandlers =
     new HashMap<>();
 
-  public DefaultUpdateManager(InMemoryRepositoryTransactionManager transactionManager) {
+  public DefaultUpdateManager(TransactionManager transactionManager) {
     this.transactionManager = transactionManager;
   }
 

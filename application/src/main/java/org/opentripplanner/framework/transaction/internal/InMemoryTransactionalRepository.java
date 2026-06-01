@@ -18,7 +18,7 @@ class InMemoryTransactionalRepository<S, T> implements TransactionalRepository<S
   InMemoryTransactionalRepository(
     S initialSnapshot,
     RepositoryLifecycle<S, T> lifecycle,
-    InMemoryRepositoryTransactionManager manager
+    TransactionManager manager
   ) {
     this.lifecycle = lifecycle;
     this.transactionProvider = manager.currentTransaction();

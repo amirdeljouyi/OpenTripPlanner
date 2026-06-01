@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.transaction.Transaction;
 
-class InMemoryRepositoryTransactionManager {
+class TransactionManager {
 
   private final AtomicLong idSequence = new AtomicLong(0);
 

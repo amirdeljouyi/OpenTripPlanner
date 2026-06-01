@@ -12,8 +12,8 @@ import org.opentripplanner.framework.transaction.UpdateManager;
 /**
  * Default implementation of {@link RepositoryRegistry}.
  *
- * <p>Wraps a {@link InMemoryRepositoryTransactionManager} to coordinate transactions across all
- * registered repositories. Each call to {@link #register(Object, RepositoryLifecycle)} creates a
+ * <p>Wraps a {@link TransactionManager} to coordinate transactions across all registered
+ * repositories. Each call to {@link #register(Object, RepositoryLifecycle)} creates a
  * {@link InMemoryTransactionalRepository} internally and returns a {@link RepositoryHandle} that
  * also implements the package-private {@link WritableHandle} interface, allowing
  * {@link org.opentripplanner.framework.transaction.internal.DefaultWriteContext} to obtain
@@ -22,8 +22,7 @@ import org.opentripplanner.framework.transaction.UpdateManager;
  */
 class DefaultRepositoryRegistry implements RepositoryRegistry {
 
-  private final InMemoryRepositoryTransactionManager transactionManager =
-    new InMemoryRepositoryTransactionManager();
+  private final TransactionManager transactionManager = new TransactionManager();
 
   @Override
   public <S, M> RepositoryHandle<S, M> register(
@@ -47,7 +46,7 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
    * Returns the transaction manager for use during wiring of the
    * {@link UpdateManager}.
    */
-  InMemoryRepositoryTransactionManager transactionManager() {
+  TransactionManager transactionManager() {
     return transactionManager;
   }
 
