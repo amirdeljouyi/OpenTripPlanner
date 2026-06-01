@@ -1,8 +1,5 @@
 package org.opentripplanner.framework.transaction.internal;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.WeakHashMap;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.transaction.RepositoryLifecycle;
 import org.opentripplanner.framework.transaction.Transaction;
@@ -12,7 +9,7 @@ class DefaultTransactionalRepository<S, T> implements TransactionalRepository<S,
 
   private final RepositoryLifecycle<S, T> lifecycle;
   private final Supplier<Transaction> transactionProvider;
-  private final Map<Transaction, S> snapshotCash = new WeakHashMap<>();
+  private final SnapshotCache<S> snapshotCash = new SnapshotCache<S>();
   private T mutableSnapshot;
 
   DefaultTransactionalRepository(
@@ -22,15 +19,13 @@ class DefaultTransactionalRepository<S, T> implements TransactionalRepository<S,
   ) {
     this.lifecycle = lifecycle;
     this.transactionProvider = manager.currentTransaction();
-    setSnapshot(initialSnapshot, this.transactionProvider.get());
+    snapshotCash.put(this.transactionProvider.get(), initialSnapshot);
     manager.register(this);
   }
 
   @Override
   public S snapshot(Transaction transaction) {
-    synchronized (snapshotCash) {
-      return snapshotCash.get(transaction);
-    }
+    return snapshotCash.get(transaction);
   }
 
   Supplier<T> mutableSnapshot() {
@@ -38,15 +33,11 @@ class DefaultTransactionalRepository<S, T> implements TransactionalRepository<S,
   }
 
   void commit(Transaction currentTransaction, Transaction nextTransaction) {
-    if (mutableSnapshot != null) {
-      setSnapshot(lifecycle.freeze(mutableSnapshot), nextTransaction);
-    } else {
-      // If there are no modifications, then we will copy over the previous snapshot
-      synchronized (snapshotCash) {
-        snapshotCash.put(nextTransaction, snapshotCash.get(currentTransaction));
-      }
-    }
-    mutableSnapshot = null;
+    S snapshot = mutableSnapshot == null
+      ? snapshotCash.get(currentTransaction)
+      : lifecycle.freeze(mutableSnapshot);
+    snapshotCash.put(nextTransaction, snapshot);
+    this.mutableSnapshot = null;
   }
 
   private T currentMutableSnapshot() {
@@ -54,12 +45,5 @@ class DefaultTransactionalRepository<S, T> implements TransactionalRepository<S,
       this.mutableSnapshot = lifecycle.copyOnWrite(snapshot(transactionProvider.get()));
     }
     return mutableSnapshot;
-  }
-
-  private void setSnapshot(S snapshot, Transaction transaction) {
-    Objects.requireNonNull(snapshot);
-    synchronized (snapshotCash) {
-      snapshotCash.put(transaction, snapshot);
-    }
   }
 }
