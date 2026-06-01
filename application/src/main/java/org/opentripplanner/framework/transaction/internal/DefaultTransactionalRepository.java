@@ -8,14 +8,14 @@ import org.opentripplanner.framework.transaction.RepositoryLifecycle;
 import org.opentripplanner.framework.transaction.Transaction;
 import org.opentripplanner.framework.transaction.TransactionalRepository;
 
-class InMemoryTransactionalRepository<S, T> implements TransactionalRepository<S, T> {
+class DefaultTransactionalRepository<S, T> implements TransactionalRepository<S, T> {
 
   private final RepositoryLifecycle<S, T> lifecycle;
   private final Supplier<Transaction> transactionProvider;
   private final Map<Transaction, S> snapshotCash = new WeakHashMap<>();
   private T mutableSnapshot;
 
-  InMemoryTransactionalRepository(
+  DefaultTransactionalRepository(
     S initialSnapshot,
     RepositoryLifecycle<S, T> lifecycle,
     TransactionManager manager

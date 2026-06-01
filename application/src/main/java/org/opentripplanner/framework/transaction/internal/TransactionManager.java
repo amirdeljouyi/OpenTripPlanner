@@ -13,7 +13,7 @@ class TransactionManager {
 
   private final AtomicReference<Transaction> currentTransaction = new AtomicReference<>(next());
 
-  private final List<InMemoryTransactionalRepository<?, ?>> repositories = new ArrayList<>();
+  private final List<DefaultTransactionalRepository<?, ?>> repositories = new ArrayList<>();
 
   public Transaction requestScopedTransaction() {
     return currentTransaction.get();
@@ -29,7 +29,7 @@ class TransactionManager {
     currentTransaction.set(nextTx);
   }
 
-  void register(InMemoryTransactionalRepository<?, ?> repository) {
+  void register(DefaultTransactionalRepository<?, ?> repository) {
     repositories.add(repository);
   }
 

@@ -14,7 +14,7 @@ import org.opentripplanner.framework.transaction.UpdateManager;
  *
  * <p>Wraps a {@link TransactionManager} to coordinate transactions across all registered
  * repositories. Each call to {@link #register(Object, RepositoryLifecycle)} creates a
- * {@link InMemoryTransactionalRepository} internally and returns a {@link RepositoryHandle} that
+ * {@link DefaultTransactionalRepository} internally and returns a {@link RepositoryHandle} that
  * also implements the package-private {@link WritableHandle} interface, allowing
  * {@link org.opentripplanner.framework.transaction.internal.DefaultWriteContext} to obtain
  * mutable snapshot access via an internal cast without exposing it on the public
@@ -29,7 +29,7 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
     S initialSnapshot,
     RepositoryLifecycle<S, M> lifecycle
   ) {
-    TransactionalRepository<S, M> repo = new InMemoryTransactionalRepository<>(
+    TransactionalRepository<S, M> repo = new DefaultTransactionalRepository<>(
       initialSnapshot,
       lifecycle,
       transactionManager
@@ -71,7 +71,7 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
 
     @Override
     public Supplier<M> mutableSnapshot() {
-      return ((InMemoryTransactionalRepository<S, M>) repo).mutableSnapshot();
+      return ((DefaultTransactionalRepository<S, M>) repo).mutableSnapshot();
     }
   }
 }
