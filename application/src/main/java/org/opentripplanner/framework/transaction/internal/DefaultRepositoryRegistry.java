@@ -26,11 +26,11 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
     new InMemoryRepositoryTransactionManager();
 
   @Override
-  public <S, T> RepositoryHandle<S, T> register(
+  public <S, M> RepositoryHandle<S, M> register(
     S initialSnapshot,
-    RepositoryLifecycle<S, T> lifecycle
+    RepositoryLifecycle<S, M> lifecycle
   ) {
-    TransactionalRepository<S, T> repo = new InMemoryTransactionalRepository<>(
+    TransactionalRepository<S, M> repo = new InMemoryTransactionalRepository<>(
       initialSnapshot,
       lifecycle,
       transactionManager
@@ -56,12 +56,12 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
    * {@link org.opentripplanner.framework.transaction.internal.DefaultWriteContext} to obtain
    * mutable snapshot access via an internal cast.
    */
-  private static class WritableRepositoryHandle<S, T>
-    implements RepositoryHandle<S, T>, WritableHandle<T> {
+  private static class WritableRepositoryHandle<S, M>
+    implements RepositoryHandle<S, M>, WritableHandle<M> {
 
-    private final TransactionalRepository<S, T> repo;
+    private final TransactionalRepository<S, M> repo;
 
-    WritableRepositoryHandle(TransactionalRepository<S, T> repo) {
+    WritableRepositoryHandle(TransactionalRepository<S, M> repo) {
       this.repo = repo;
     }
 
@@ -71,8 +71,8 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
     }
 
     @Override
-    public Supplier<T> mutableSnapshot() {
-      return ((InMemoryTransactionalRepository<S, T>) repo).mutableSnapshot();
+    public Supplier<M> mutableSnapshot() {
+      return ((InMemoryTransactionalRepository<S, M>) repo).mutableSnapshot();
     }
   }
 }

@@ -12,16 +12,14 @@ package org.opentripplanner.framework.transaction;
  *       {@link RepositoryScope} from the framework and call
  *       {@link RepositoryScope#snapshot(RepositoryHandle)} on it, which guarantees that all
  *       repositories in one request are resolved against the same transaction.
- *   <li><em>Updaters</em> obtain write access exclusively through a
- *       {@link WriteContext} provided by the
- *       {@link UpdateManager}. Handles are
- *       read-only from the public API.
+ *   <li><em>Updaters</em> obtain write access exclusively through a {@link WriteContext} provided
+ *       by the {@link UpdateManager}. Handles are read-only from the public API.
  * </ul>
  *
  * @param <S> the read-only snapshot type
- * @param <T> the mutable snapshot type
+ * @param <M> the mutable snapshot type
  */
-public interface RepositoryHandle<S, T> {
+public interface RepositoryHandle<S, M> {
   /**
    * Resolve a read-only snapshot for the given transaction.
    *
