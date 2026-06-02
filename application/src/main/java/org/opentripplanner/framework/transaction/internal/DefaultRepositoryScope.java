@@ -25,4 +25,9 @@ class DefaultRepositoryScope implements RepositoryScope {
   public <S> S snapshot(RepositoryHandle<S, ?> handle) {
     return handle.readOnlySnapshot(transaction);
   }
+
+  @Override
+  public String toString() {
+    return "Scope(" + transaction + ')';
+  }
 }
