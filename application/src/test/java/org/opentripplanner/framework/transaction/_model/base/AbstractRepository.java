@@ -1,0 +1,35 @@
+package org.opentripplanner.framework.transaction._model.base;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+
+public abstract class AbstractRepository<E extends Entity> {
+
+  private final Map<Integer, E> entitiesById;
+
+  public AbstractRepository(Map<Integer, E> entitiesById) {
+    this.entitiesById = entitiesById;
+  }
+
+  public E add(E entity) {
+    return this.entitiesById.put(entity.id(), entity);
+  }
+
+  public E getById(Integer id) {
+    return entitiesById.get(id);
+  }
+
+  public Collection<Integer> listIds() {
+    return Collections.unmodifiableSet(entitiesById.keySet());
+  }
+
+  public Map<Integer, E> copyOfEntitiesById() {
+    return Map.copyOf(entitiesById);
+  }
+
+  @Override
+  public final String toString() {
+    return getClass().getSimpleName() + "(" + System.identityHashCode(this) + ")";
+  }
+}
