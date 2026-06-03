@@ -33,7 +33,6 @@ public interface UpdateManager {
    * injecting the mutable snapshot for {@code repoHandle} at dispatch time.
    *
    * @param handler    the event handler to register
-   * @param repoHandle the repository handle whose mutable snapshot the handler writes to
    * @param <E>        the domain event type
    * @param <M>        the mutable snapshot type
    */
@@ -53,4 +52,10 @@ public interface UpdateManager {
    * @return a {@link Future} that completes after the task has run and changes have been committed
    */
   Future<Void> submit(Consumer<WriteContext> task);
+
+  boolean autoCommitEnabled();
+
+  Future<Void> commit();
+
+  void shutdown();
 }

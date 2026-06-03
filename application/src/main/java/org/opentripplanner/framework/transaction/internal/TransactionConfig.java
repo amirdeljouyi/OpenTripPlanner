@@ -1,5 +1,7 @@
 package org.opentripplanner.framework.transaction.internal;
 
+import java.time.Duration;
+import java.util.concurrent.ThreadFactory;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.UpdateManager;
 
@@ -9,7 +11,17 @@ public class TransactionConfig {
     return new DefaultRepositoryRegistry();
   }
 
-  public static UpdateManager createUpdateManager(RepositoryRegistry registry) {
-    return new DefaultUpdateManager(((DefaultRepositoryRegistry) registry).transactionManager());
+  public static UpdateManager createUpdateManager(
+    String name,
+    RepositoryRegistry registry,
+    ThreadFactory threadFactory,
+    Duration commitInterval
+  ) {
+    return new DefaultUpdateManager(
+      name,
+      ((DefaultRepositoryRegistry) registry).transactionManager(),
+      threadFactory,
+      commitInterval
+    );
   }
 }

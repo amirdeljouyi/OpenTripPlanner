@@ -1,5 +1,6 @@
 package org.opentripplanner.framework.transaction.internal;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,7 +8,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.event.DomainEvent;
 import org.opentripplanner.framework.event.EventHandler;
 import org.opentripplanner.framework.transaction.RepositoryHandle;
@@ -25,12 +28,22 @@ import org.opentripplanner.framework.transaction.WriteContext;
 class DefaultUpdateManager implements UpdateManager {
 
   private final TransactionManager transactionManager;
-  private final ExecutorService executor = Executors.newSingleThreadExecutor();
+  private final ExecutorService executor;
   private final Map<Class<?>, List<DefaultWriteContext.HandlerEntry<?, ?>>> eventHandlers =
     new HashMap<>();
+  private final PeriodicCommitScheduler periodicCommitScheduler;
 
-  public DefaultUpdateManager(TransactionManager transactionManager) {
+  DefaultUpdateManager(
+    String name,
+    TransactionManager transactionManager,
+    ThreadFactory threadFactory,
+    @Nullable Duration commitInterval
+  ) {
     this.transactionManager = transactionManager;
+    this.executor = Executors.newSingleThreadExecutor(threadFactory);
+    this.periodicCommitScheduler = commitInterval != null
+      ? new PeriodicCommitScheduler(name, commitInterval, threadFactory, this::performCommit)
+      : null;
   }
 
   @Override
@@ -46,8 +59,34 @@ class DefaultUpdateManager implements UpdateManager {
   @Override
   public Future<Void> submit(Consumer<WriteContext> task) {
     return executor.submit(() -> {
-      WriteContext ctx = new DefaultWriteContext(eventHandlers);
-      task.accept(ctx);
+      task.accept(new DefaultWriteContext(eventHandlers));
+      return null;
+    });
+  }
+
+  @Override
+  public boolean autoCommitEnabled() {
+    return periodicCommitScheduler != null;
+  }
+
+  @Override
+  public Future<Void> commit() {
+    if (autoCommitEnabled()) {
+      throw new IllegalStateException("Auto-commit is enabled");
+    }
+    return performCommit();
+  }
+
+  @Override
+  public void shutdown() {
+    if (periodicCommitScheduler != null) {
+      periodicCommitScheduler.shutdown();
+    }
+    executor.shutdown();
+  }
+
+  private Future<Void> performCommit() {
+    return executor.submit(() -> {
       transactionManager.commit();
       return null;
     });
