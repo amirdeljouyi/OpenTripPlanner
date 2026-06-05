@@ -4,16 +4,16 @@ import java.util.function.Supplier;
 import org.opentripplanner.framework.transaction.Transaction;
 import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
 
-class DefaultTransactionalRepository<S, T> {
+class TransactionalRepository<S, M> {
 
-  private final RepositoryLifecycle<S, T> lifecycle;
+  private final RepositoryLifecycle<S, M> lifecycle;
   private final Supplier<Transaction> transactionProvider;
   private final SnapshotCache<S> snapshotCash = new SnapshotCache<S>();
-  private T mutableSnapshot;
+  private M mutableSnapshot;
 
-  DefaultTransactionalRepository(
+  TransactionalRepository(
     S initialSnapshot,
-    RepositoryLifecycle<S, T> lifecycle,
+    RepositoryLifecycle<S, M> lifecycle,
     TransactionManager manager
   ) {
     this.lifecycle = lifecycle;
@@ -26,7 +26,7 @@ class DefaultTransactionalRepository<S, T> {
     return snapshotCash.get(transaction);
   }
 
-  Supplier<T> mutableSnapshot() {
+  Supplier<M> mutableSnapshot() {
     return this::currentMutableSnapshot;
   }
 
@@ -38,7 +38,7 @@ class DefaultTransactionalRepository<S, T> {
     this.mutableSnapshot = null;
   }
 
-  private T currentMutableSnapshot() {
+  private M currentMutableSnapshot() {
     if (mutableSnapshot == null) {
       this.mutableSnapshot = lifecycle.copyOnWrite(snapshot(transactionProvider.get()));
     }
