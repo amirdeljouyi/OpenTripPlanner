@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.repository;
 
-import org.opentripplanner.framework.transaction.RepositoryLifecycle;
+import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
 
 public class TimetableSnapshotLifecycle
   implements RepositoryLifecycle<ReadOnlyTimetableSnapshot, MutableTimetableSnapshot> {

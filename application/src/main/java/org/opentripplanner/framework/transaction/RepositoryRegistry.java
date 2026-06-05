@@ -1,5 +1,9 @@
 package org.opentripplanner.framework.transaction;
 
+import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
+import org.opentripplanner.framework.transaction.api.RepositoryScope;
+
 /**
  * Application-scoped registry for transactional repositories.
  *

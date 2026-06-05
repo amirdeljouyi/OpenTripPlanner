@@ -4,6 +4,8 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.event.DomainEvent;
 import org.opentripplanner.framework.event.EventHandler;
+import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.api.WriteContext;
 
 /**
  * Application-scoped manager for write operations against transactional repositories.
@@ -29,12 +31,12 @@ public interface UpdateManager {
    *
    * <p>When a {@link org.opentripplanner.framework.event.DomainEvent} matching
    * {@code handler.eventType()} is published via {@link WriteContext#publish}, the
-   * {@link WriteContext} will call {@code handler.handle(event, mutable(repoHandle))},
-   * injecting the mutable snapshot for {@code repoHandle} at dispatch time.
+   * {@link WriteContext} will call {@code handler.handle(event, mutableRepository(repoHandle))},
+   * injecting the mutable repository for {@code repoHandle} at dispatch time.
    *
    * @param handler    the event handler to register
    * @param <E>        the domain event type
-   * @param <M>        the mutable snapshot type
+   * @param <M>        the mutable repository type
    */
   <E extends DomainEvent, M> void register(
     EventHandler<E, M> handler,
@@ -53,9 +55,23 @@ public interface UpdateManager {
    */
   Future<Void> submit(Consumer<WriteContext> task);
 
+  /** Returns {@code true} if a periodic commit scheduler is configured. */
   boolean autoCommitEnabled();
 
+  /**
+   * Manually trigger a commit on the writer thread.
+   *
+   * <p>May only be called when {@link #autoCommitEnabled()} returns {@code false}; throws
+   * {@link IllegalStateException} otherwise.
+   *
+   * @return a {@link Future} that completes after the commit is done
+   */
   Future<Void> commit();
 
+  /**
+   * Shut down the writer thread and (if configured) the periodic commit scheduler.
+   *
+   * <p>Pending submitted tasks are allowed to complete; no new tasks are accepted after this call.
+   */
   void shutdown();
 }

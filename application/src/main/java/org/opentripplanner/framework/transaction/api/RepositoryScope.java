@@ -1,4 +1,7 @@
-package org.opentripplanner.framework.transaction;
+package org.opentripplanner.framework.transaction.api;
+
+import org.opentripplanner.framework.transaction.RepositoryRegistry;
+import org.opentripplanner.framework.transaction.Transaction;
 
 /**
  * Request-scoped consistent view over one or more repositories.

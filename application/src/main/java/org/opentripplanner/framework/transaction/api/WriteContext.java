@@ -1,8 +1,9 @@
-package org.opentripplanner.framework.transaction;
+package org.opentripplanner.framework.transaction.api;
 
 import java.util.function.Supplier;
 import org.opentripplanner.framework.event.DomainEvent;
 import org.opentripplanner.framework.event.EventHandler;
+import org.opentripplanner.framework.transaction.UpdateManager;
 
 /**
  * Task-scoped coordination point for write access during a single update.

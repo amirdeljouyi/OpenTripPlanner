@@ -13,9 +13,9 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.event.DomainEvent;
 import org.opentripplanner.framework.event.EventHandler;
-import org.opentripplanner.framework.transaction.RepositoryHandle;
 import org.opentripplanner.framework.transaction.UpdateManager;
-import org.opentripplanner.framework.transaction.WriteContext;
+import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.api.WriteContext;
 
 /**
  * Default implementation of {@link UpdateManager}.

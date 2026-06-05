@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.event.DomainEvent;
 import org.opentripplanner.framework.event.EventHandler;
-import org.opentripplanner.framework.transaction.RepositoryHandle;
-import org.opentripplanner.framework.transaction.WriteContext;
+import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.api.WriteContext;
 
 /**
  * Task-scoped implementation of {@link WriteContext}.

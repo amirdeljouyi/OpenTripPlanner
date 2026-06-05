@@ -1,13 +1,13 @@
 package org.opentripplanner.framework.transaction.internal;
 
 import java.util.function.Supplier;
-import org.opentripplanner.framework.transaction.RepositoryHandle;
-import org.opentripplanner.framework.transaction.RepositoryLifecycle;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
-import org.opentripplanner.framework.transaction.RepositoryScope;
 import org.opentripplanner.framework.transaction.Transaction;
 import org.opentripplanner.framework.transaction.TransactionalRepository;
 import org.opentripplanner.framework.transaction.UpdateManager;
+import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
+import org.opentripplanner.framework.transaction.api.RepositoryScope;
 
 /**
  * Default implementation of {@link RepositoryRegistry}.

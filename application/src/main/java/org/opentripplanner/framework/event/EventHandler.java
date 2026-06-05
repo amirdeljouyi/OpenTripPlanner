@@ -1,6 +1,6 @@
 package org.opentripplanner.framework.event;
 
-import org.opentripplanner.framework.transaction.WriteContext;
+import org.opentripplanner.framework.transaction.api.WriteContext;
 
 /**
  * A write-side event handler that receives a mutable repository snapshot at dispatch time.
