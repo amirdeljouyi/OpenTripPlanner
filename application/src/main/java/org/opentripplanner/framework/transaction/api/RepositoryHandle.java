@@ -2,11 +2,10 @@ package org.opentripplanner.framework.transaction.api;
 
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.Transaction;
-import org.opentripplanner.framework.transaction.TransactionalRepository;
 import org.opentripplanner.framework.transaction.UpdateManager;
 
 /**
- * Application-scoped typed access point for a single {@link TransactionalRepository}.
+ * Application-scoped typed access point for a single transactional repository.
  *
  * <p>A handle is obtained once at wiring time via
  * {@link RepositoryRegistry#register(Object, RepositoryLifecycle)} and then injected wherever

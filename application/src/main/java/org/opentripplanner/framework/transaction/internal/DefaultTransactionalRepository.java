@@ -2,10 +2,9 @@ package org.opentripplanner.framework.transaction.internal;
 
 import java.util.function.Supplier;
 import org.opentripplanner.framework.transaction.Transaction;
-import org.opentripplanner.framework.transaction.TransactionalRepository;
 import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
 
-class DefaultTransactionalRepository<S, T> implements TransactionalRepository<S, T> {
+class DefaultTransactionalRepository<S, T> {
 
   private final RepositoryLifecycle<S, T> lifecycle;
   private final Supplier<Transaction> transactionProvider;
@@ -23,7 +22,6 @@ class DefaultTransactionalRepository<S, T> implements TransactionalRepository<S,
     manager.register(this);
   }
 
-  @Override
   public S snapshot(Transaction transaction) {
     return snapshotCash.get(transaction);
   }

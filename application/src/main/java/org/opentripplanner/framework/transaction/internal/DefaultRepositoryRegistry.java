@@ -3,7 +3,6 @@ package org.opentripplanner.framework.transaction.internal;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.Transaction;
-import org.opentripplanner.framework.transaction.TransactionalRepository;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
@@ -29,7 +28,7 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
     S initialSnapshot,
     RepositoryLifecycle<S, M> lifecycle
   ) {
-    TransactionalRepository<S, M> repo = new DefaultTransactionalRepository<>(
+    DefaultTransactionalRepository<S, M> repo = new DefaultTransactionalRepository<>(
       initialSnapshot,
       lifecycle,
       transactionManager
@@ -58,9 +57,9 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
   private static class WritableRepositoryHandle<S, M>
     implements RepositoryHandle<S, M>, WritableHandle<M> {
 
-    private final TransactionalRepository<S, M> repo;
+    private final DefaultTransactionalRepository<S, M> repo;
 
-    WritableRepositoryHandle(TransactionalRepository<S, M> repo) {
+    WritableRepositoryHandle(DefaultTransactionalRepository<S, M> repo) {
       this.repo = repo;
     }
 
@@ -71,7 +70,7 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
 
     @Override
     public Supplier<M> mutableSnapshot() {
-      return ((DefaultTransactionalRepository<S, M>) repo).mutableSnapshot();
+      return repo.mutableSnapshot();
     }
   }
 }
