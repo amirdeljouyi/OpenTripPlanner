@@ -29,8 +29,7 @@ class DefaultUpdateManager implements UpdateManager {
 
   private final TransactionManager transactionManager;
   private final ExecutorService executor;
-  private final Map<Class<?>, List<DefaultWriteContext.HandlerEntry<?, ?>>> eventHandlers =
-    new HashMap<>();
+  private final Map<Class<?>, List<HandlerEntry<?, ?>>> eventHandlers = new HashMap<>();
   private final PeriodicCommitScheduler periodicCommitScheduler;
 
   DefaultUpdateManager(
@@ -53,7 +52,7 @@ class DefaultUpdateManager implements UpdateManager {
   ) {
     eventHandlers
       .computeIfAbsent(handler.eventType(), k -> new ArrayList<>())
-      .add(new DefaultWriteContext.HandlerEntry<>(handler, repoHandle));
+      .add(new HandlerEntry<>(handler, repoHandle));
   }
 
   @Override
