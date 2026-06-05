@@ -2,7 +2,7 @@ package org.opentripplanner.framework.transaction;
 
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
-import org.opentripplanner.framework.transaction.api.RepositoryScope;
+import org.opentripplanner.framework.transaction.api.TransactionScope;
 
 /**
  * Application-scoped registry for transactional repositories.
@@ -14,7 +14,7 @@ import org.opentripplanner.framework.transaction.api.RepositoryScope;
  *   <li>For each domain repository, call {@link #register(Object, RepositoryLifecycle)} during
  *       wiring (e.g. in a Dagger module). Keep the returned {@link RepositoryHandle} for
  *       injection into services and updaters.
- *   <li>At the start of each request, call {@link #scope()} to obtain a {@link RepositoryScope}
+ *   <li>At the start of each request, call {@link #scope()} to obtain a {@link TransactionScope}
  *       that captures a consistent snapshot of all repositories at that point in time.
  *   <li>To perform writes, use the
  *       {@link UpdateManager}, which commits
@@ -37,14 +37,14 @@ public interface RepositoryRegistry {
   <S, T> RepositoryHandle<S, T> register(S initialSnapshot, RepositoryLifecycle<S, T> lifecycle);
 
   /**
-   * Create a new {@link RepositoryScope} capturing the current transaction.
+   * Create a new {@link TransactionScope} capturing the current transaction.
    *
-   * <p>All calls to {@link RepositoryScope#snapshot(RepositoryHandle)} on the returned scope will
+   * <p>All calls to {@link TransactionScope#snapshot(RepositoryHandle)} on the returned scope will
    * resolve against the same transaction, guaranteeing a consistent read view across all
    * repositories for the duration of the request.
    *
    * <p>In a Dagger setup this method would be called from a request-scoped {@code @Provides}
    * method.
    */
-  RepositoryScope scope();
+  TransactionScope scope();
 }

@@ -19,7 +19,7 @@ import org.opentripplanner.framework.transaction.Transaction;
  * <p>Obtain a scope via {@link RepositoryRegistry#scope()} at request start. In a Dagger setup
  * this would typically be provided by a request-scoped {@code @Provides} method.
  */
-public interface RepositoryScope {
+public interface TransactionScope {
   /**
    * Resolve the read-only snapshot for the given repository handle, using the transaction that
    * was captured when this scope was created.

@@ -7,7 +7,7 @@ import org.opentripplanner.framework.transaction.TransactionalRepository;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
-import org.opentripplanner.framework.transaction.api.RepositoryScope;
+import org.opentripplanner.framework.transaction.api.TransactionScope;
 
 /**
  * Default implementation of {@link RepositoryRegistry}.
@@ -38,8 +38,8 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
   }
 
   @Override
-  public RepositoryScope scope() {
-    return new DefaultRepositoryScope(transactionManager.requestScopedTransaction());
+  public TransactionScope scope() {
+    return new DefaultTransactionScope(transactionManager.requestScopedTransaction());
   }
 
   /**

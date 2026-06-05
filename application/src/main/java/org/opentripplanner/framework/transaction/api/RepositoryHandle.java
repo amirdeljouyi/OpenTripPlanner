@@ -14,8 +14,8 @@ import org.opentripplanner.framework.transaction.UpdateManager;
  *
  * <ul>
  *   <li>Request-scoped <em>services</em> should not call this directly. Instead they receive a
- *       {@link RepositoryScope} from the framework and call
- *       {@link RepositoryScope#snapshot(RepositoryHandle)} on it, which guarantees that all
+ *       {@link TransactionScope} from the framework and call
+ *       {@link TransactionScope#snapshot(RepositoryHandle)} on it, which guarantees that all
  *       repositories in one request are resolved against the same transaction.
  *   <li><em>Updaters</em> obtain write access exclusively through a {@link WriteContext} provided
  *       by the {@link UpdateManager}. Handles are read-only from the public API.
@@ -28,7 +28,7 @@ public interface RepositoryHandle<S, M> {
   /**
    * Resolve a read-only snapshot for the given transaction.
    *
-   * <p>This is an internal method called by {@link RepositoryScope}. Application code should use
+   * <p>This is an internal method called by {@link TransactionScope}. Application code should use
    * the scope instead of calling this directly.
    */
   S readOnlySnapshot(Transaction transaction);

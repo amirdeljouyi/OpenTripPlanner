@@ -2,10 +2,10 @@ package org.opentripplanner.framework.transaction.internal;
 
 import org.opentripplanner.framework.transaction.Transaction;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.framework.transaction.api.RepositoryScope;
+import org.opentripplanner.framework.transaction.api.TransactionScope;
 
 /**
- * Default request-scoped implementation of {@link RepositoryScope}.
+ * Default request-scoped implementation of {@link TransactionScope}.
  *
  * <p>Captures the current {@link Transaction} at construction time and holds a strong reference
  * to it for its lifetime. This prevents the corresponding snapshot cache entries in the underlying
@@ -13,11 +13,11 @@ import org.opentripplanner.framework.transaction.api.RepositoryScope;
  * all {@link #snapshot(RepositoryHandle)} calls within the same scope resolve against the same
  * transaction.
  */
-class DefaultRepositoryScope implements RepositoryScope {
+class DefaultTransactionScope implements TransactionScope {
 
   private final Transaction transaction;
 
-  DefaultRepositoryScope(Transaction transaction) {
+  DefaultTransactionScope(Transaction transaction) {
     this.transaction = transaction;
   }
 
