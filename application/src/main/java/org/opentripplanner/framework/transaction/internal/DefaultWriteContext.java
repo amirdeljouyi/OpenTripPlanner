@@ -11,10 +11,10 @@ import org.opentripplanner.framework.transaction.api.WriteContext;
 
 /**
  * Task-scoped implementation of {@link WriteContext}.
- *
- * <p>Created fresh for each task submitted to {@link DefaultUpdateManager}. Holds the registered
- * event handler map and delegates mutable snapshot access to the internal {@link WritableHandle}
- * on each repository handle.
+ * <p>
+ * Created fresh for each task submitted to {@link DefaultUpdateManager}. Holds the registered
+ * event handler map and delegates mutable snapshot access to the internal
+ * {@link DefaultRepositoryHandle} on each repository handle.
  */
 class DefaultWriteContext implements WriteContext {
 
@@ -26,7 +26,7 @@ class DefaultWriteContext implements WriteContext {
 
   @Override
   public <M> Supplier<M> mutable(RepositoryHandle<?, M> handle) {
-    return ((WritableHandle<M>) handle).mutableSnapshot();
+    return ((DefaultRepositoryHandle<?, M>) handle).mutableSnapshot();
   }
 
   @Override

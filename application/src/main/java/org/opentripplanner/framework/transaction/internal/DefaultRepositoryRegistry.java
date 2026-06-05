@@ -1,8 +1,6 @@
 package org.opentripplanner.framework.transaction.internal;
 
-import java.util.function.Supplier;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
-import org.opentripplanner.framework.transaction.Transaction;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
@@ -13,8 +11,7 @@ import org.opentripplanner.framework.transaction.api.TransactionScope;
  *
  * <p>Wraps a {@link TransactionManager} to coordinate transactions across all registered
  * repositories. Each call to {@link #register(Object, RepositoryLifecycle)} creates a
- * {@link TransactionalRepository} internally and returns a {@link RepositoryHandle} that
- * also implements the package-private {@link WritableHandle} interface, allowing
+ * {@link TransactionalRepository} internally and returns a {@link RepositoryHandle}, allowing
  * {@link org.opentripplanner.framework.transaction.internal.DefaultWriteContext} to obtain
  * mutable snapshot access via an internal cast without exposing it on the public
  * {@link RepositoryHandle} API.
@@ -33,7 +30,7 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
       lifecycle,
       transactionManager
     );
-    return new WritableRepositoryHandle<>(repo);
+    return new DefaultRepositoryHandle<>(repo);
   }
 
   @Override
@@ -47,30 +44,5 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
    */
   TransactionManager transactionManager() {
     return transactionManager;
-  }
-
-  /**
-   * A {@link RepositoryHandle} that also implements {@link WritableHandle}, allowing the
-   * {@link org.opentripplanner.framework.transaction.internal.DefaultWriteContext} to obtain
-   * mutable snapshot access via an internal cast.
-   */
-  private static class WritableRepositoryHandle<S, M>
-    implements RepositoryHandle<S, M>, WritableHandle<M> {
-
-    private final TransactionalRepository<S, M> repo;
-
-    WritableRepositoryHandle(TransactionalRepository<S, M> repo) {
-      this.repo = repo;
-    }
-
-    @Override
-    public S readOnlySnapshot(Transaction transaction) {
-      return repo.snapshot(transaction);
-    }
-
-    @Override
-    public Supplier<M> mutableSnapshot() {
-      return repo.mutableSnapshot();
-    }
   }
 }
