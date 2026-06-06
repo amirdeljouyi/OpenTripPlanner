@@ -3,17 +3,16 @@ package org.opentripplanner.framework.transaction.internal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 import org.opentripplanner.framework.event.DomainEvent;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.WriteContext;
 
 /**
  * Task-scoped implementation of {@link WriteContext}.
- * <p>
- * Created fresh for each task submitted to {@link DefaultUpdateManager}. Holds the registered
- * event handler map and delegates mutable snapshot access to the internal
- * {@link DefaultRepositoryHandle} on each repository handle.
+ *
+ * <p>Created fresh for each task submitted to {@link DefaultUpdateManager}. Holds the registered
+ * event handler map and gets mutable repositories by casting each
+ * {@link RepositoryHandle} to {@link DefaultRepositoryHandle}.
  */
 class DefaultWriteContext implements WriteContext {
 
@@ -24,8 +23,8 @@ class DefaultWriteContext implements WriteContext {
   }
 
   @Override
-  public <M> Supplier<M> mutable(RepositoryHandle<?, M> handle) {
-    return ((DefaultRepositoryHandle<?, M>) handle).mutableSnapshot();
+  public <M> M repository(RepositoryHandle<?, M> handle) {
+    return ((DefaultRepositoryHandle<?, M>) handle).repository();
   }
 
   @Override
@@ -39,8 +38,9 @@ class DefaultWriteContext implements WriteContext {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private <E extends DomainEvent, M> void dispatch(HandlerEntry<E, M> entry, DomainEvent event) {
-    M mutableSnapshot = mutable(entry.repoHandle()).get();
-    entry.handler().handle((E) event, mutableSnapshot);
+    M repository = repository(entry.repoHandle());
+    entry.handler().handle((E) event, repository);
   }
 }

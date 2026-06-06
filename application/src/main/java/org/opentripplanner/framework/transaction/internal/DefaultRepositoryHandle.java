@@ -1,12 +1,13 @@
 package org.opentripplanner.framework.transaction.internal;
 
-import java.util.function.Supplier;
-import org.opentripplanner.framework.transaction.Transaction;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.framework.transaction.api.TransactionScope;
 
 /**
- * A {@link RepositoryHandle} that also allowing the {@link DefaultWriteContext} to obtain mutable
- * repository.
+ * Package-private implementation of {@link RepositoryHandle} that additionally exposes
+ * {@link #repository()} for write access within the package. {@link DefaultWriteContext}
+ * casts to this type to obtain the mutable repository without exposing write access on the
+ * public {@link RepositoryHandle} API.
  */
 class DefaultRepositoryHandle<S, M> implements RepositoryHandle<S, M> {
 
@@ -17,11 +18,12 @@ class DefaultRepositoryHandle<S, M> implements RepositoryHandle<S, M> {
   }
 
   @Override
-  public S readOnlySnapshot(Transaction transaction) {
+  public S snapshotRepository(TransactionScope scope) {
+    var transaction = ((DefaultTransactionScope) scope).transaction();
     return repo.snapshot(transaction);
   }
 
-  Supplier<M> mutableSnapshot() {
-    return repo.mutableSnapshot();
+  M repository() {
+    return repo.mutableSnapshot().get();
   }
 }

@@ -1,7 +1,6 @@
 package org.opentripplanner.framework.transaction.internal;
 
 import java.util.function.Supplier;
-import org.opentripplanner.framework.transaction.Transaction;
 import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
 
 class TransactionalRepository<S, M> {

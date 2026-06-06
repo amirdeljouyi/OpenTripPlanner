@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
-import org.opentripplanner.framework.transaction.Transaction;
 
 class TransactionManager {
 
@@ -38,6 +37,6 @@ class TransactionManager {
   }
 
   private Transaction next() {
-    return new DefaultTransaction(idSequence.incrementAndGet());
+    return new Transaction(idSequence.incrementAndGet());
   }
 }
