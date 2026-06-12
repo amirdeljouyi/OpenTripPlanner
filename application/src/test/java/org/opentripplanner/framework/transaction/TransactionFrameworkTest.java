@@ -26,39 +26,6 @@ import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.framework.transaction.api.WriteContext;
 import org.opentripplanner.framework.transaction.internal.TransactionFactory;
 
-///
-/// What do we need?
-///
-/// GRAPH BUILD
-/// - Use the mutable repository to add entities.
-///   1. Parse an input source
-///   2. Map into domain builders/objects(none indexed)
-///   3. Validate the domain objects.
-///   4. Add to the **mutable repository**. The repository is responsible for indexing and
-///      assigning unique internal sequence IDs. _These sequence IDs should not be used by
-///      x-referencing domain objects across repositories._
-///
-/// APPLICATION CONTEXT
-///  1. Create the RepositoryRegistry and register repositories with the initialized
-///     snapshot.
-///  2. Bind the RepositoryRegistry and the UpdateManager to the application context.
-///  2. (Create a repository handle for each repository.)
-///  3. Use the repository handle to access the repository within a transaction scope.
-///
-/// DAGGER REQUEST SCOPE
-///   1) Get a scope-object or transaction object from the registry.
-///   2) Use the scope to inject a snapshot repository into services.
-///
-///
-///
-///
-/// ### Important notes
-/// - Use public IDs to reference entities across agregates/repositories.
-/// -
-///
-///
-///
-///
 public class TransactionFrameworkTest {
 
   public static final String PUBLISH_DOMAIN_EVENT =
@@ -136,8 +103,8 @@ public class TransactionFrameworkTest {
   private Consumer<WriteContext> publishNewAUsingARepo() {
     return writeContext -> {
       System.out.println(WRITE_A_3_B_13_TO_REPOSITORY);
-      writeContext.mutableRepository(aRepoHandler).add(new A(3, "Add A3 using repo"));
-      writeContext.mutableRepository(bRepoHandler).add(new B(13, "Add B13 using repo"));
+      writeContext.repository(aRepoHandler).add(new A(3, "Add A3 using repo"));
+      writeContext.repository(bRepoHandler).add(new B(13, "Add B13 using repo"));
     };
   }
 
@@ -154,7 +121,7 @@ public class TransactionFrameworkTest {
     TransactionScope scope,
     RepositoryHandle<S, ?> handle
   ) {
-    S snapshot = handle.snapshot(scope);
+    S snapshot = handle.snapshotRepository(scope);
     var ids = snapshot.listIds().stream().sorted().toList();
     assertEquals(expIds, ids);
   }

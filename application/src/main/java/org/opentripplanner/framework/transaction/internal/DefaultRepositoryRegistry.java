@@ -21,7 +21,7 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
   private final TransactionManager transactionManager = new TransactionManager();
 
   @Override
-  public <S, M> RepositoryHandle<S, M> register(
+  public <S, M> RepositoryHandle<S, M> registerSnapshot(
     S initialSnapshot,
     RepositoryLifecycle<S, M> lifecycle
   ) {
@@ -31,6 +31,14 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
       transactionManager
     );
     return new DefaultRepositoryHandle<>(repo);
+  }
+
+  @Override
+  public <S, M> RepositoryHandle<S, M> registerRepository(
+    M repository,
+    RepositoryLifecycle<S, M> lifecycle
+  ) {
+    return registerSnapshot(lifecycle.freeze(repository), lifecycle);
   }
 
   @Override
