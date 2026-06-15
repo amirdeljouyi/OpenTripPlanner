@@ -18,12 +18,12 @@ class DefaultRepositoryHandle<S, M> implements RepositoryHandle<S, M> {
   }
 
   @Override
-  public S snapshotRepository(TransactionScope scope) {
+  public S repositorySnapshot(TransactionScope scope) {
     var transaction = ((DefaultTransactionScope) scope).transaction();
-    return repo.snapshot(transaction);
+    return repo.repositorySnapshot(transaction);
   }
 
   M repository() {
-    return repo.mutableSnapshot().get();
+    return repo.repository().get();
   }
 }

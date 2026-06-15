@@ -7,14 +7,14 @@ import java.util.WeakHashMap;
 /**
  * A thread-safe cache for storing transaction snapshots using weak references to transactions.
  */
-class SnapshotCache<S> {
+class RepositorySnapshotCache<S> {
 
   private final Map<Transaction, S> cache = new WeakHashMap<>();
 
-  void put(Transaction transaction, S snapshot) {
-    Objects.requireNonNull(snapshot);
+  void put(Transaction transaction, S repositorySnapshot) {
+    Objects.requireNonNull(repositorySnapshot);
     synchronized (cache) {
-      cache.put(transaction, snapshot);
+      cache.put(transaction, repositorySnapshot);
     }
   }
 

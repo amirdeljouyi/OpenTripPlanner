@@ -54,7 +54,10 @@ public class TransactionFrameworkTest {
 
     this.registry = TransactionFactory.createRepositoryRegistry();
     this.aRepoHandler = registry.registerRepository(aRepository, aRepository);
-    this.bRepoHandler = registry.registerSnapshot(bRepository.freeze(bRepository), bRepository);
+    this.bRepoHandler = registry.registerRepositorySnapshot(
+      bRepository.freeze(bRepository),
+      bRepository
+    );
 
     var threadFactory = new ThreadFactoryBuilder().setNameFormat("autoCommit").build();
     updateManager = TransactionFactory.createUpdateManager(
@@ -121,7 +124,7 @@ public class TransactionFrameworkTest {
     TransactionScope scope,
     RepositoryHandle<S, ?> handle
   ) {
-    S snapshot = handle.snapshotRepository(scope);
+    S snapshot = handle.repositorySnapshot(scope);
     var ids = snapshot.listIds().stream().sorted().toList();
     assertEquals(expIds, ids);
   }

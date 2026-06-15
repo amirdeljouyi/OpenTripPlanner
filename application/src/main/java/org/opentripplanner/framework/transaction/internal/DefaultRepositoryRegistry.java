@@ -10,23 +10,22 @@ import org.opentripplanner.framework.transaction.api.TransactionScope;
  * Default implementation of {@link RepositoryRegistry}.
  *
  * <p>Wraps a {@link TransactionManager} to coordinate transactions across all registered
- * repositories. Each call to {@link #register(Object, RepositoryLifecycle)} creates a
- * {@link TransactionalRepository} internally and returns a {@link RepositoryHandle}, allowing
- * {@link org.opentripplanner.framework.transaction.internal.DefaultWriteContext} to obtain
- * mutable snapshot access via an internal cast without exposing it on the public
- * {@link RepositoryHandle} API.
+ * repositories. Each call to {@link #registerRepositorySnapshot(Object, RepositoryLifecycle)} creates a
+ * {@link TransactionalRepository} and wraps it in a {@link DefaultRepositoryHandle}, which exposes
+ * mutable access to {@link DefaultWriteContext} via an internal cast without surfacing it on the
+ * public {@link RepositoryHandle} API.
  */
 class DefaultRepositoryRegistry implements RepositoryRegistry {
 
   private final TransactionManager transactionManager = new TransactionManager();
 
   @Override
-  public <S, M> RepositoryHandle<S, M> registerSnapshot(
-    S initialSnapshot,
+  public <S, M> RepositoryHandle<S, M> registerRepositorySnapshot(
+    S initialRepositorySnapshot,
     RepositoryLifecycle<S, M> lifecycle
   ) {
     TransactionalRepository<S, M> repo = new TransactionalRepository<>(
-      initialSnapshot,
+      initialRepositorySnapshot,
       lifecycle,
       transactionManager
     );
@@ -38,7 +37,7 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
     M repository,
     RepositoryLifecycle<S, M> lifecycle
   ) {
-    return registerSnapshot(lifecycle.freeze(repository), lifecycle);
+    return registerRepositorySnapshot(lifecycle.freeze(repository), lifecycle);
   }
 
   @Override
