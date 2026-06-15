@@ -1,7 +1,6 @@
 package org.opentripplanner.framework.transaction.internal;
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
 
@@ -37,23 +36,19 @@ class TransactionalRepository<S, M> {
   }
 
   void commit(Transaction lastTransaction, Transaction nextTransaction) {
-    if(modified()) {
+    if (modified()) {
       // Modifications exist, create a new snapshot and put it in the cache.
       S snapshot = lifecycle.freeze(this.repository);
       repositorySnapshotCache.put(nextTransaction, snapshot);
       reset();
-    }
-    else {
-      // There is no changes to the repository, so get last snapshot and assign it
-      // to the next transaction
+    } else {
+      // No changes to this repository; carry the last snapshot forward to the next transaction.
       S snapshot = repositorySnapshotCache.get(lastTransaction);
       repositorySnapshotCache.put(nextTransaction, snapshot);
     }
   }
 
-  /**
-   * Clear the repository reference, so a new one is created for the next tasks.
-   */
+  // Clear the repository reference so a fresh copy-on-write instance is created for the next task.
   void reset() {
     this.repository = null;
   }

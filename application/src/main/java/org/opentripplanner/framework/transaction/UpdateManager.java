@@ -43,11 +43,18 @@ public interface UpdateManager {
    * Submit an update task for execution on the single writer thread.
    * <p>
    * The task receives a fresh {@link WriteContext} scoped to this invocation. All writes and event
-   * publications must go through the context. After the task returns, it is put on a queue and
-   * commited with all pending tasks at commit time.
+   * publications must go through the context.
+   * <p>
+   * In <em>atomic-commit</em> mode (no periodic scheduler) the commit is performed immediately
+   * after the task completes, and the returned {@link Future} resolves when the commit is done.
+   * If the task throws a {@link RuntimeException} a rollback is performed and the exception is
+   * propagated through the Future.
+   * <p>
+   * In <em>periodic-commit</em> mode the Future resolves as soon as the task completes; the
+   * commit is performed later by the periodic scheduler.
    *
    * @param task the task to execute
-   * @return a {@link Future} that completes after the task has run and changes have been committed
+   * @return a {@link Future} that completes after the task (and commit, in atomic mode) has run
    */
   Future<Void> submit(Consumer<WriteContext> task);
 

@@ -21,7 +21,6 @@ public class ASnapshot extends AbstractRepository<A> {
     throw new UnsupportedOperationException("ASnapshot is immutable");
   }
 
-
   ARepository copyOnWrite() {
     return new ARepository(new HashMap<>(copyOfEntitiesById()), updateListeners);
   }

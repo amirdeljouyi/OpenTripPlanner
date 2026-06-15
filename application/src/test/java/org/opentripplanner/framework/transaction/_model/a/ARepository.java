@@ -6,13 +6,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.transaction._model.base.AbstractRepository;
-import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
 
 public class ARepository extends AbstractRepository<A> {
 
   private final List<Consumer<AUpdateSystemEvent>> updateListeners;
 
-  public ARepository(Map<Integer, A> entitiesById, List<Consumer<AUpdateSystemEvent>> updateListeners) {
+  public ARepository(
+    Map<Integer, A> entitiesById,
+    List<Consumer<AUpdateSystemEvent>> updateListeners
+  ) {
     super(entitiesById);
     this.updateListeners = updateListeners;
   }

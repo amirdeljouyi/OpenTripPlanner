@@ -22,16 +22,12 @@ public class BRepository
   }
 
   @Override
-  public BRepository copyOnWrite(
-    BSnapshot readOnlySnapshot
-  ) {
+  public BRepository copyOnWrite(BSnapshot readOnlySnapshot) {
     return this;
   }
 
   @Override
-  public BSnapshot freeze(
-    BRepository mutableSnapshot
-  ) {
+  public BSnapshot freeze(BRepository mutableSnapshot) {
     return new BSnapshot(copyOfEntitiesById());
   }
 
