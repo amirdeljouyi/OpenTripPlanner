@@ -24,6 +24,10 @@ class TransactionalRepository<S, M> {
     manager.register(this);
   }
 
+  boolean modified() {
+    return repository != null;
+  }
+
   S repositorySnapshot(Transaction transaction) {
     return repositorySnapshotCache.get(transaction);
   }
@@ -33,10 +37,24 @@ class TransactionalRepository<S, M> {
   }
 
   void commit(Transaction lastTransaction, Transaction nextTransaction) {
-    S snapshot = this.repository == null
-      ? repositorySnapshotCache.get(lastTransaction)
-      : lifecycle.freeze(this.repository);
-    repositorySnapshotCache.put(nextTransaction, snapshot);
+    if(modified()) {
+      // Modifications exist, create a new snapshot and put it in the cache.
+      S snapshot = lifecycle.freeze(this.repository);
+      repositorySnapshotCache.put(nextTransaction, snapshot);
+      reset();
+    }
+    else {
+      // There is no changes to the repository, so get last snapshot and assign it
+      // to the next transaction
+      S snapshot = repositorySnapshotCache.get(lastTransaction);
+      repositorySnapshotCache.put(nextTransaction, snapshot);
+    }
+  }
+
+  /**
+   * Clear the repository reference, so a new one is created for the next tasks.
+   */
+  void reset() {
     this.repository = null;
   }
 

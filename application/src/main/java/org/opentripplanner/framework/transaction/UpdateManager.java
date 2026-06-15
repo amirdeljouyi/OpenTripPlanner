@@ -51,19 +51,6 @@ public interface UpdateManager {
    */
   Future<Void> submit(Consumer<WriteContext> task);
 
-  /** Returns {@code true} if a periodic commit scheduler is configured. */
-  boolean autoCommitEnabled();
-
-  /**
-   * Manually trigger a commit on the writer thread.
-   * <p>
-   * May only be called when {@link #autoCommitEnabled()} returns {@code false}; throws
-   * {@link IllegalStateException} otherwise.
-   *
-   * @return a {@link Future} that completes after the commit is done
-   */
-  Future<Void> commit();
-
   /**
    * Shut down the writer thread and (if configured) the periodic commit scheduler.
    * <p>

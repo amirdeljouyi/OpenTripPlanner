@@ -37,6 +37,6 @@ public class BRepository
 
   public void aUpdatedHandler(AUpdateSystemEvent e) {
     A a = e.newA();
-    add(new B(1_000, "B updated " + a.name()));
+    add(new B(1_000 + a.id(), "B updated " + a.name()));
   }
 }

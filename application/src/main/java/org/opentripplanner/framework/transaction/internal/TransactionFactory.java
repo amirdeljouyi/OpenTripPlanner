@@ -18,7 +18,20 @@ public class TransactionFactory {
     return new DefaultRepositoryRegistry();
   }
 
-  public static UpdateManager createUpdateManager(
+  public static UpdateManager createUpdateManagerWithAtomicCommits(
+    String name,
+    RepositoryRegistry registry,
+    ThreadFactory threadFactory
+  ) {
+    return new DefaultUpdateManager(
+      name,
+      ((DefaultRepositoryRegistry) registry).transactionManager(),
+      threadFactory,
+      null
+    );
+  }
+
+  public static UpdateManager createUpdateManagerWithPeriodicCommits(
     String name,
     RepositoryRegistry registry,
     ThreadFactory threadFactory,

@@ -19,6 +19,10 @@ class TransactionManager {
   }
 
   public void commit() {
+    // Skip commit if no modification exist
+    if (repositories.stream().noneMatch(TransactionalRepository::modified)) {
+      return;
+    }
     var currentTx = currentTransaction.get();
     var nextTx = next();
 
@@ -26,6 +30,12 @@ class TransactionManager {
       repository.commit(currentTx, nextTx);
     }
     currentTransaction.set(nextTx);
+  }
+
+  void rollback() {
+    for (var repository : repositories) {
+      repository.reset();
+    }
   }
 
   void register(TransactionalRepository<?, ?> repository) {

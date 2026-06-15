@@ -41,7 +41,7 @@ class DefaultUpdateManager implements UpdateManager {
     this.transactionManager = transactionManager;
     this.executor = Executors.newSingleThreadExecutor(threadFactory);
     this.periodicCommitScheduler = commitInterval != null
-      ? new PeriodicCommitScheduler(name, commitInterval, threadFactory, this::performCommit)
+      ? new PeriodicCommitScheduler(name, commitInterval, threadFactory, this::submitCommit)
       : null;
   }
 
@@ -57,23 +57,7 @@ class DefaultUpdateManager implements UpdateManager {
 
   @Override
   public Future<Void> submit(Consumer<WriteContext> task) {
-    return executor.submit(() -> {
-      task.accept(new DefaultWriteContext(eventHandlers));
-      return null;
-    });
-  }
-
-  @Override
-  public boolean autoCommitEnabled() {
-    return periodicCommitScheduler != null;
-  }
-
-  @Override
-  public Future<Void> commit() {
-    if (autoCommitEnabled()) {
-      throw new IllegalStateException("Auto-commit is enabled");
-    }
-    return performCommit();
+    return useAtomicCommit() ? submitAndAutoCommit(task) : submitAndReturn(task);
   }
 
   @Override
@@ -84,10 +68,38 @@ class DefaultUpdateManager implements UpdateManager {
     executor.shutdown();
   }
 
-  private Future<Void> performCommit() {
+  private boolean useAtomicCommit() {
+    return periodicCommitScheduler == null;
+  }
+
+  private Future<Void> submitAndAutoCommit(Consumer<WriteContext> task) {
+    return executor.submit(() -> {
+      try {
+        task.accept(new DefaultWriteContext(eventHandlers));
+        transactionManager.commit();
+      } catch (RuntimeException e) {
+        rollback();
+        throw e;
+      }
+      return null;
+    });
+  }
+
+  private Future<Void> submitAndReturn(Consumer<WriteContext> task) {
+    return executor.submit(() -> {
+      task.accept(new DefaultWriteContext(eventHandlers));
+      return null;
+    });
+  }
+
+  private Future<Void> submitCommit() {
     return executor.submit(() -> {
       transactionManager.commit();
       return null;
     });
+  }
+
+  private void rollback() {
+    transactionManager.rollback();
   }
 }
