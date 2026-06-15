@@ -24,12 +24,12 @@ public abstract class AbstractRepository<E extends Entity> {
     return Collections.unmodifiableSet(entitiesById.keySet());
   }
 
-  public Map<Integer, E> copyOfEntitiesById() {
-    return Map.copyOf(entitiesById);
-  }
-
   @Override
   public final String toString() {
     return getClass().getSimpleName() + "(" + System.identityHashCode(this) + ")";
+  }
+
+  protected Map<Integer, E> copyOfEntitiesById() {
+    return Map.copyOf(entitiesById);
   }
 }

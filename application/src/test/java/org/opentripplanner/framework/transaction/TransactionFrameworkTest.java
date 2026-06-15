@@ -8,10 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.transaction._model.a.A;
 import org.opentripplanner.framework.transaction._model.a.ARepository;
+import org.opentripplanner.framework.transaction._model.a.ARepositoryLifecycle;
 import org.opentripplanner.framework.transaction._model.a.ASnapshot;
 import org.opentripplanner.framework.transaction._model.b.B;
 import org.opentripplanner.framework.transaction._model.b.BRepository;
@@ -36,7 +38,7 @@ public class TransactionFrameworkTest {
   private UpdateManager updateManager;
   private RepositoryHandle<ASnapshot, ARepository> aRepoHandler;
   private RepositoryHandle<BSnapshot, BRepository> bRepoHandler;
-  private List<String> eventLog = new ArrayList<>();
+  private final List<String> eventLog = new ArrayList<>();
 
   @BeforeEach
   public void setUp() throws Exception {
@@ -53,7 +55,7 @@ public class TransactionFrameworkTest {
     aRepository.addUpdateListener(bRepository::aUpdatedHandler);
 
     this.registry = TransactionFactory.createRepositoryRegistry();
-    this.aRepoHandler = registry.registerRepository(aRepository, aRepository);
+    this.aRepoHandler = registry.registerRepository(aRepository, new ARepositoryLifecycle());
     this.bRepoHandler = registry.registerRepositorySnapshot(
       bRepository.freeze(bRepository),
       bRepository

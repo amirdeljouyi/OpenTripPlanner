@@ -3,28 +3,21 @@ package org.opentripplanner.framework.transaction._model.a;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.transaction._model.base.AbstractRepository;
 import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
 
-public class ARepository
-  extends AbstractRepository<A>
-  implements RepositoryLifecycle<ASnapshot, ARepository> {
+public class ARepository extends AbstractRepository<A> {
 
-  private List<Consumer<AUpdateSystemEvent>> updateListeners = new ArrayList<>();
+  private final List<Consumer<AUpdateSystemEvent>> updateListeners = new ArrayList<>();
+
+  public ARepository(Map<Integer, A> entitiesById) {
+    super(entitiesById);
+  }
 
   public ARepository() {
-    super(new HashMap<>());
-  }
-
-  @Override
-  public ARepository copyOnWrite(ASnapshot readOnlySnapshot) {
-    return this;
-  }
-
-  @Override
-  public ASnapshot freeze(ARepository mutableSnapshot) {
-    return new ASnapshot(copyOfEntitiesById());
+    this(new HashMap<>());
   }
 
   @Override
@@ -38,5 +31,9 @@ public class ARepository
 
   public void addUpdateListener(Consumer<AUpdateSystemEvent> updateListener) {
     updateListeners.add(updateListener);
+  }
+
+  ASnapshot freeze() {
+    return new ASnapshot(copyOfEntitiesById());
   }
 }

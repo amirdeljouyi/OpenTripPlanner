@@ -6,8 +6,15 @@ import org.opentripplanner.framework.transaction._model.a.AUpdateSystemEvent;
 import org.opentripplanner.framework.transaction._model.base.AbstractRepository;
 import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
 
+/**
+ * This repository implements the {@link RepositoryLifecycle} interface, but does not create a new
+ * mutable repository for each transaction. Instead, it returns the same instance for each
+ * transaction, and freeze it into a snapshot  when the transaction is committed. This does not
+ * support atomic commits and rollback in case a task fails, but is more memory efficient since
+ * only the freeze action trigger copying the internal data structure.
+ */
 public class BRepository
-  extends AbstractRepository<org.opentripplanner.framework.transaction._model.b.B>
+  extends AbstractRepository<B>
   implements RepositoryLifecycle<BSnapshot, BRepository> {
 
   public BRepository() {
@@ -16,20 +23,20 @@ public class BRepository
 
   @Override
   public BRepository copyOnWrite(
-    org.opentripplanner.framework.transaction._model.b.BSnapshot readOnlySnapshot
+    BSnapshot readOnlySnapshot
   ) {
     return this;
   }
 
   @Override
-  public org.opentripplanner.framework.transaction._model.b.BSnapshot freeze(
+  public BSnapshot freeze(
     BRepository mutableSnapshot
   ) {
-    return new org.opentripplanner.framework.transaction._model.b.BSnapshot(copyOfEntitiesById());
+    return new BSnapshot(copyOfEntitiesById());
   }
 
   public void aUpdatedHandler(AUpdateSystemEvent e) {
     A a = e.newA();
-    add(new org.opentripplanner.framework.transaction._model.b.B(1_000, "B updated " + a.name()));
+    add(new B(1_000, "B updated " + a.name()));
   }
 }
