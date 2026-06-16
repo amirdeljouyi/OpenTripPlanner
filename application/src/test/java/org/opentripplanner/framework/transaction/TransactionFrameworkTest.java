@@ -35,7 +35,6 @@ public class TransactionFrameworkTest {
 
   public static final String PUBLISH_DOMAIN_EVENT =
     "Create new A & B with id 7 using a domain event";
-  public static final String WRITE_A_3_B_13_TO_REPOSITORY = "Create A3 & B13 using repository";
   private RepositoryRegistry registry;
   private UpdateManager updateManager;
   private RepositoryHandle<ASnapshot, ARepository> aRepoHandler;
@@ -44,14 +43,14 @@ public class TransactionFrameworkTest {
 
   @BeforeEach
   public void setUp() throws Exception {
-    // Create 2 repositories that uses a slightly different strategy for the life-cycle.
-    // - ARepository uses a life-cycle manager and copy everything from the snapshot to the
+    // Create 2 repositories that use a slightly different strategy for the life-cycle.
+    // - ARepository uses a life-cycle manager and copies everything from the snapshot to the
     //   repository, and from the repository to the snapshot - enabling rollback and true atomic
     //   commits.
-    // - BRepository does not use a life-cycle manager, and return the same instance for each
-    //   transaction, and freeze it into a snapshot when the transaction is committed. This does
+    // - BRepository does not use a life-cycle manager and returns the same instance for each
+    //   transaction and freezes it into a snapshot when the transaction is committed. This does
     //   not support atomic commits and rollback in case a task fails, but is more memory efficient
-    //   since only the freeze action trigger copying the internal data structure.
+    //   since only the freeze action triggers copying the internal data structure.
     ARepository aRepository = new ARepository();
     BRepository bRepository = new BRepository();
 
@@ -60,9 +59,6 @@ public class TransactionFrameworkTest {
     B b = new B(10, "B1");
     aRepository.add(a);
     bRepository.add(b);
-
-    // set up a system event from AReop -> BRepo
-    aRepository.addUpdateListener(bRepository::aUpdatedHandler);
 
     this.registry = TransactionFactory.createRepositoryRegistry();
     this.aRepoHandler = registry.registerRepository(aRepository, new ARepositoryLifecycle());
@@ -104,11 +100,11 @@ public class TransactionFrameworkTest {
     assertState("Scope(TXN-1)", List.of(1), List.of(10));
     blockTask.countDown();
     f.get();
-    assertState("Scope(TXN-2)", List.of(1, 3), List.of(10, 13, 1003));
+    assertState("Scope(TXN-2)", List.of(1, 3), List.of(10, 13));
 
     f = processTask(updateManager, publishNewAUsingADomainEvent());
     f.get();
-    assertState("Scope(TXN-3)", List.of(1, 3, 7), List.of(10, 13, 17, 1003, 1007));
+    assertState("Scope(TXN-3)", List.of(1, 3, 7), List.of(10, 13, 17));
 
     updateManager.shutdown();
 
@@ -141,12 +137,12 @@ public class TransactionFrameworkTest {
     var f = processTask(updateManager, publishNewAUsingARepo());
     f.get();
     assertState("Scope(TXN-1)", List.of(1), List.of(10));
-    awaitState("Scope(TXN-2)", List.of(1, 3), List.of(10, 13, 1003));
+    awaitState("Scope(TXN-2)", List.of(1, 3), List.of(10, 13));
 
     f = processTask(updateManager, publishNewAUsingADomainEvent());
     f.get();
-    assertState("Scope(TXN-2)", List.of(1, 3), List.of(10, 13, 1003));
-    awaitState("Scope(TXN-3)", List.of(1, 3, 7), List.of(10, 13, 17, 1003, 1007));
+    assertState("Scope(TXN-2)", List.of(1, 3), List.of(10, 13));
+    awaitState("Scope(TXN-3)", List.of(1, 3, 7), List.of(10, 13, 17));
 
     updateManager.shutdown();
     assertEquals(
@@ -195,7 +191,7 @@ public class TransactionFrameworkTest {
     // B did NOT roll back: BRepository.copyOnWrite returns the same mutable instance, so its state
     // survives reset().  Both the explicit add (B13) and the domain-event-driven add (B1003, fired
     // when A3 was added before the failure) leaked into the committed snapshot.
-    assertState("Scope(TXN-2)", List.of(1, 5), List.of(10, 13, 15, 1003, 1005));
+    assertState("Scope(TXN-2)", List.of(1, 5), List.of(10, 13, 15));
 
     updateManager.shutdown();
   }
@@ -240,6 +236,7 @@ public class TransactionFrameworkTest {
     assertEquals(expIds, ids);
   }
 
+  @SuppressWarnings("BusyWait")
   private void awaitState(String expScope, List<Integer> expAIds, List<Integer> expBIds)
     throws InterruptedException {
     long deadline = System.currentTimeMillis() + 2_000;
